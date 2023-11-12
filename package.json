@@ -2,6 +2,10 @@
   "name": "tztool",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Javier Martinez"
+  },
+  "license": "BSD-3-Clause",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,16 +13,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bootstrap": "^5.3.2",
+    "dayjs": "^1.11.10",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "next": "14.0.1",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.0.1"
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/moment-timezone": "^0.5.30",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.0.1"
+    "eslint-config-next": "14.0.1",
+    "typescript": "^5"
   }
 }
