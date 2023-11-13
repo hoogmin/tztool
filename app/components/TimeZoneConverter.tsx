@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-// import dayjs from "dayjs"
-// import utc from "dayjs/plugin/utc"
-// import timezone from "dayjs/plugin/timezone"
 import moment from "moment-timezone"
 
-// Dayjs setup and setting of initial values for state.
+// Setting of initial values for state.
 // Also util functions not directly related to state.
-// dayjs.extend(utc)
-// dayjs.extend(timezone)
 const defaultTimezone: string = moment.tz.guess() || "America/New_York"
 moment.tz.setDefault(defaultTimezone)
 const defaultToTimezone: string = "Europe/London"
@@ -19,6 +14,7 @@ const defaultStartTime: string = moment().format(timeFormat) // TODO: For defaul
 const defaultConvertedTime: string = moment().tz(defaultToTimezone).format(timeFormat)
 
 const isEmpty = (str: string) => typeof str === "undefined" || str === null || str.length === 0
+const inRange = (n: number, l: number, u: number) => n >= l && n <= u
 
 const isValidTimeFormat = (timeString: string) => {
     // Not designed to be a perfect check.
@@ -33,10 +29,22 @@ const isValidTimeFormat = (timeString: string) => {
     return false
 }
 
-// Be sure to validate the given time string before calling convert12to24 and convert24to12.
 const convert12to24 = (time12: string) => {
+    // Be sure to validate the given time string before calling convert12to24.
+    // If it is invalid, simply return midnight in 24-hour time.
+    const validationRegex = /^(\d{1,2}):(\d{2})( )(AM|PM|am|pm)$/
+
+    if (!time12.match(validationRegex)) {
+        return "00:00"
+    }
+
     const [time, period] = time12.split(' ') // period is meridiem (AM/PM)
-    let [hours, minutes]: [number, number] = time.split(':').map(Number) as [number, number]
+    let [hours, minutes]: [number | string, number | string] = time.split(':').map(Number) as [number, number]
+
+    // Don't allow the original 12-hour time to be out of range.
+    if (!inRange(hours, 1, 12) || !inRange(minutes, 0, 59)) {
+        return "00:00"
+    }
   
     if (period.toUpperCase() === 'PM' && hours !== 12) {
       hours += 12
@@ -45,8 +53,8 @@ const convert12to24 = (time12: string) => {
     }
   
     // Add leading zeros for single-digit hours/minutes
-    hours = hours < 10 ? parseInt('0' + hours) : hours
-    minutes = minutes < 10 ? minutes : minutes
+    hours = hours < 10 ? '0' + hours : hours
+    minutes = minutes < 10 ? '0' + minutes : minutes
   
     return `${hours}:${minutes}`
 }
@@ -86,13 +94,16 @@ const TimeZoneConverter = () => {
     }
 
     const tfhTimeEnabledChange = () => {
+        let newFromTime = "00:00"
+
         if (tfhTimeEnabled) {
             timeFormat = "HH:mm"
+            newFromTime = convert12to24(fromTime)
         } else {
             timeFormat = "hh:mm A"
+            newFromTime = moment(`11-5-2023 ${fromTime}`, `MM-DD-YYYY ${timeFormat}`).format(timeFormat)
         }
-
-        const newFromTime = moment(`11-5-2023 ${fromTime}`, `MM-DD-YYYY ${timeFormat}`).format(timeFormat)
+        
         const newConvertedTime = moment(`11-5-2023 ${fromTime}`, `MM-DD-YYYY ${timeFormat}`).tz(toTimezone).format(timeFormat)
         setFromTime(newFromTime)
         setConvertedTime(newConvertedTime)
@@ -151,7 +162,8 @@ const TimeZoneConverter = () => {
             {
                 allTimezones ? (
                     <select
-                    className="form-select form-select-sm" 
+                    className="form-select form-select-sm"
+                    data-live-search="true" 
                     name="toTimezoneDropdown" 
                     id="toTimezoneDropdown" 
                     value={toTimezone} 
