@@ -5,7 +5,7 @@ import './globals.css'
 const inconsolata = Inconsolata({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TZTool',
+  title: 'TZTool | Time Zone Converter',
   description: 'Convert one timezone to another.',
 }
 

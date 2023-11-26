@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react"
 import moment from "moment-timezone"
+import TzFilterableSelect from "./TzFilterableSelect"
+import {
+    isEmpty,
+    isValidTimeFormat,
+    convert12to24
+} from "@/app/tzt-helpers"
 
 // Setting of initial values for state.
 // Also util functions not directly related to state.
@@ -12,52 +18,6 @@ const allTimezones: string[] | null = moment.tz.names() || null // Could use Int
 let timeFormat: string = "hh:mm A"
 const defaultStartTime: string = moment().format(timeFormat) // TODO: For default timezone.
 const defaultConvertedTime: string = moment().tz(defaultToTimezone).format(timeFormat)
-
-const isEmpty = (str: string) => typeof str === "undefined" || str === null || str.length === 0
-const inRange = (n: number, l: number, u: number) => n >= l && n <= u
-
-const isValidTimeFormat = (timeString: string) => {
-    // Not designed to be a perfect check.
-    // Should be used as an auxiliary to ensure the
-    // time string is generally in the right format.
-    const regex = /^(\d{1,2}):(\d{2})( )?(AM|PM|am|pm)?$/
-
-    if (timeString.match(regex)) {
-        return true
-    }
-
-    return false
-}
-
-const convert12to24 = (time12: string) => {
-    // Be sure to validate the given time string before calling convert12to24.
-    // If it is invalid, simply return midnight in 24-hour time.
-    const validationRegex = /^(\d{1,2}):(\d{2})( )(AM|PM|am|pm)$/
-
-    if (!time12.match(validationRegex)) {
-        return "00:00"
-    }
-
-    const [time, period] = time12.split(' ') // period is meridiem (AM/PM)
-    let [hours, minutes]: [number | string, number | string] = time.split(':').map(Number) as [number, number]
-
-    // Don't allow the original 12-hour time to be out of range.
-    if (!inRange(hours, 1, 12) || !inRange(minutes, 0, 59)) {
-        return "00:00"
-    }
-  
-    if (period.toUpperCase() === 'PM' && hours !== 12) {
-      hours += 12
-    } else if (period.toUpperCase() === 'AM' && hours === 12) {
-      hours = 0
-    }
-  
-    // Add leading zeros for single-digit hours/minutes
-    hours = hours < 10 ? '0' + hours : hours
-    minutes = minutes < 10 ? '0' + minutes : minutes
-  
-    return `${hours}:${minutes}`
-}
 
 const TimeZoneConverter = () => {
     const [fromTimezone, setFromTimezone] = useState(defaultTimezone)
@@ -142,39 +102,22 @@ const TimeZoneConverter = () => {
             <label htmlFor="fromTimezoneDropdown" className="form-label">From:&nbsp;</label>
             {
                 allTimezones ? (
-                    <select
-                    className="form-select form-select-sm" 
-                    name="fromTimezoneDropdown" 
-                    id="fromTimezoneDropdown" 
-                    value={fromTimezone} 
-                    onChange={(e) => setFromTimezone(e.target.value)}
-                    aria-label="Timezone to convert from dropdown">
-                        {
-                            allTimezones.map((tzName, index) => (
-                                <option value={tzName} key={index}>{tzName}</option>
-                            ))
-                        }
-                    </select>
+                    <TzFilterableSelect
+                    nameId="fromTimezoneDropdown"
+                    options={allTimezones}
+                    tzValue={fromTimezone}
+                    setTzFunc={setFromTimezone}/>
                 ) : (<span className="text-danger">Outdated!</span>)
             }
             <br />
             <label htmlFor="toTimezoneDropdown" className="form-label">To:&nbsp;</label>
             {
                 allTimezones ? (
-                    <select
-                    className="form-select form-select-sm"
-                    data-live-search="true" 
-                    name="toTimezoneDropdown" 
-                    id="toTimezoneDropdown" 
-                    value={toTimezone} 
-                    onChange={(e) => setToTimezone(e.target.value)}
-                    aria-label="Timezone to convert to dropdown">
-                        {
-                            allTimezones.map((tzName, index) => (
-                                <option value={tzName} key={index}>{tzName}</option>
-                            ))
-                        }
-                    </select>
+                    <TzFilterableSelect
+                    nameId="toTimezoneDropdown"
+                    options={allTimezones}
+                    tzValue={toTimezone}
+                    setTzFunc={setToTimezone}/>
                 ) : (<span className="text-danger">Outdated!</span>)
             }
             <br />
