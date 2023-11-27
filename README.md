@@ -1,12 +1,28 @@
 # TZTool: React.js/Next.js-based Time Zone Converter
 
 A small project I chose to build to sharpen skills and for fun.
-Time is more tricky for computers than at first glance. I am still in the
-midst of working on this but most of the core functionality is here. I opted to
-use momentjs for this project rather than dayjs (I was initially using dayjs). dayjs
-wasn't the best fit for this use case, at least at the moment. Its timezone plugin still
-needs work. When it improves, I may migrate this project over if there is ample reason.
+I opted to use momentjs over dayjs for this project as dayjs's timezone
+plugin still needs work. This app converts a time from one timezone to its
+corresponding time in another timezone. In practice, timezones are a lot trickier
+than at first glance. Though I believe in its current version that I have ironed out
+the major stuff and it is in a well working state. If you do encounter anything strange,
+feel free to submit a pull request.
+
+![TZTool Screenshot](tztool-screenshot.png "TZTool | FOSS Timezone converter")
+
+# Running it yourself
+
+To run this app:
+-   Ensure you have `nodejs` installed. (I used v20.9.0 at time of writing this)
+-   Clone the project to your local system.
+-   `cd` into the root of the project directory.
+-   Run `npm i` to install all dependencies.
+-   `npm run dev` to execute the dev environment.
+-   The app should now be up at `localhost:3000`
+
+That is all for the local environment. I may deploy this at some point and if so
+I will update this README accordingly (if I don't forget :sweat_smile:).
 
 # License
 This project is fully open-source under the terms of the BSD-3-Clause license.
-Read the license file for details.
+Read the LICENSE file for details.
